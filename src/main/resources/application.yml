@@ -30,14 +30,6 @@ spring:
       name: admin
       password: admin
 
-  # OAuth2 (나중에 설정)
-  # oauth2:
-  #   client:
-  #     registration:
-  #       google:
-  #         client-id: ${GOOGLE_CLIENT_ID}
-  #         client-secret: ${GOOGLE_CLIENT_SECRET}
-  #         scope: email, profile
 
 server:
   port: 8080
@@ -47,8 +39,27 @@ server:
 
 # JWT (나중에 사용)
 jwt:
-  secret: temporary-secret-key-change-this-later-to-something-secure-at-least-256-bits
-  expiration: 86400000
+  secret: ${JWT_SECRET}
+  access-token:
+    validity-in-minutes: 720 # 720분 = 12시간. 코드의 기본값 720000과는 다름!(단위를 분으로 맞춤)
+  refresh-token:
+    validity-in-days: 14 # 14일 (코드의 기본값과 일치)
+
+# Steam OpenID 설정
+softawii:
+  steam:
+    token: ${SOFTAWII_STEAM_TOKEN}
+
+# Swagger 설정
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
 
 # AI 서버 (나중에 설정)
 ai:
