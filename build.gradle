@@ -46,6 +46,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0' // 최신 안정 버전 사용 권장
+
     // WebFlux (AI 서버 HTTP 호출용)
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
