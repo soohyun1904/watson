@@ -1,5 +1,8 @@
-package com.detective.game.steam.service;
+package com.detective.game.auth.adapter.out.persistence;
 
+import com.detective.game.auth.application.port.out.RefreshTokenPort;
+import com.detective.game.auth.domain.model.AuthRefreshToken;
+import com.detective.game.auth.domain.model.AuthUser;
 import com.detective.game.common.exception.ErrorMessage;
 import com.detective.game.common.exception.RefreshTokenException;
 import com.detective.game.common.exception.UserException;
@@ -10,26 +13,25 @@ import com.detective.game.user.domain.User;
 import com.detective.game.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
-
 import static com.detective.game.common.exception.ErrorMessage.REFRESH_TOKEN_DELETE_ERROR;
 
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 @Transactional
-public class RefreshTokenService {
+public class RefreshTokenJpaRepository implements RefreshTokenPort {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserMapper userMapper;
+    private final RefreshTokenMapper refreshTokenMapper;
 
-    @Transactional
-    public boolean validateRefreshToken(String tokenValue) {
+    @Override
+    public boolean validate(String tokenValue) {
         Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshToken(tokenValue);
 
         if (refreshTokenOpt.isEmpty()) {
@@ -39,31 +41,35 @@ public class RefreshTokenService {
 
         jwtTokenProvider.validateToken(tokenValue);
 
-        // 3. Refresh Token 타입인지 확인
         if (!jwtTokenProvider.isRefreshToken(tokenValue)) {
             log.error("Refresh Token이 아닌 토큰: {}", tokenValue);
             return false;
         }
+
+        AuthRefreshToken token = refreshTokenMapper.toDomain(refreshTokenOpt.get());
+        if (token.isExpired() || token.isRevoked()) {
+            log.error("만료되었거나 해지된 Refresh Token: {}", tokenValue);
+            return false;
+        }
+
         return true;
     }
 
-    @Transactional
-    public Optional<User> getUserByRefreshToken(String tokenValue) {
+    @Override
+    public Optional<AuthUser> getUserByRefreshToken(String tokenValue) {
         return refreshTokenRepository.findByRefreshToken(tokenValue)
                 .flatMap(token -> userRepository.findById(token.getUserId()))
-                .filter(User::getIsActive); // 활성 사용자만 반환
+                .filter(User::getIsActive)
+                .map(userMapper::toDomain);
     }
-    @Transactional
-    public void saveRefreshToken(String refreshToken, Long userId) {
+
+    @Override
+    public void save(String refreshToken, Long userId, Instant expiryDate) {
         try {
-            // 사용자 존재 확인
             if (!userRepository.existsById(userId)) {
                 throw new UserException(ErrorMessage.USER_NOT_FOUND);
             }
 
-            Instant expiryDate = jwtTokenProvider.getExpirationFromToken(refreshToken).toInstant();
-
-            // 기존 리프레시 토큰이 있으면 업데이트, 없으면 새로 저장
             refreshTokenRepository.findByUserId(userId)
                     .ifPresentOrElse(
                             token -> {
@@ -71,12 +77,13 @@ public class RefreshTokenService {
                                 log.info("event=refresh_token_updated, user_id={}", userId);
                             },
                             () -> {
-                                RefreshToken newRefreshToken = RefreshToken.builder()
+                                RefreshToken newToken = RefreshToken.builder()
                                         .refreshToken(refreshToken)
                                         .userId(userId)
                                         .expiryDate(expiryDate)
+                                        .revoked(false)
                                         .build();
-                                refreshTokenRepository.save(newRefreshToken);
+                                refreshTokenRepository.save(newToken);
                                 log.info("event=refresh_token_created, user_id={}", userId);
                             }
                     );
@@ -86,9 +93,8 @@ public class RefreshTokenService {
         }
     }
 
-
-    @Transactional
-    public void deleteRefreshTokenByUserId(Long userId) {
+    @Override
+    public void deleteByUserId(Long userId) {
         try {
             refreshTokenRepository.deleteByUserId(userId);
             log.info("event=refresh_token_deleted, user_id={}", userId);

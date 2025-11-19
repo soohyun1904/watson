@@ -1,4 +1,4 @@
-package com.detective.game.steam.config;
+package com.detective.game.auth.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

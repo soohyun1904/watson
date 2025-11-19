@@ -1,10 +1,14 @@
-package com.detective.game.steam.controller;
+package com.detective.game.auth.adapter.in.web;
 
+import com.detective.game.auth.application.command.LogoutCommand;
+import com.detective.game.auth.application.command.RefreshTokenCommand;
+import com.detective.game.auth.application.port.in.AccessTokenResult;
+import com.detective.game.auth.application.port.in.LogoutUseCase;
+import com.detective.game.auth.application.port.in.RefreshTokenUseCase;
 import com.detective.game.common.response.ApiResponse;
 import com.detective.game.steam.dto.AccessTokenDTO;
 import com.detective.game.steam.dto.RefreshTokenDTO;
 import com.detective.game.steam.jwt.UserDetailsImpl;
-import com.detective.game.steam.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,50 +16,38 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 토큰 관리 API
- * (Steam 인증은 SteamAuthController에서 처리)
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 @Tag(name = "Token Management", description = "토큰 갱신 및 로그아웃 API")
+@RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final RefreshTokenUseCase refreshTokenUseCase;
+    private final LogoutUseCase logoutUseCase;
 
-    /**
-     * Access Token 갱신
-     * Refresh Token으로 새로운 Access Token 발급
-     *
-     * POST /api/auth/refresh
-     * Body: { "refreshToken": "xxx" }
-     */
     @PostMapping("/refresh")
     @Operation(
             summary = "토큰 갱신",
             description = "Refresh Token으로 새로운 Access Token을 발급합니다."
     )
-    public ResponseEntity<ApiResponse<AccessTokenDTO>> refreshToken(
-            @RequestBody RefreshTokenDTO refreshTokenDTO) {
+    public ResponseEntity<ApiResponse<AccessTokenDTO>> refresh(
+            @RequestBody RefreshTokenDTO dto) {
 
-        log.info("토큰 갱신 요청");
-        AccessTokenDTO newAccessToken = authService.refreshToken(refreshTokenDTO);
+        AccessTokenResult result = refreshTokenUseCase.refresh(
+                new RefreshTokenCommand(dto.getRefreshToken())
+        );
 
+        AccessTokenDTO responseDto = new AccessTokenDTO(result.getAccessToken());
         return ResponseEntity.ok(
-                ApiResponse.success("토큰 갱신이 완료되었습니다.", newAccessToken)
+                ApiResponse.success("토큰 갱신이 완료되었습니다.", responseDto)
         );
     }
 
-    /**
-     * 로그아웃
-     * Refresh Token을 DB에서 삭제
-     *
-     * POST /api/auth/logout
-     * Header: Authorization: Bearer {accessToken}
-     */
     @PostMapping("/logout")
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(
@@ -65,11 +57,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        Long userId = userDetails.getId();
-        log.info("로그아웃 요청: userId={}", userId);
-
-        authService.logout(userId);
-
+        logoutUseCase.logout(new LogoutCommand(userDetails.getId()));
         return ResponseEntity.ok(
                 ApiResponse.success("로그아웃되었습니다.", null)
         );

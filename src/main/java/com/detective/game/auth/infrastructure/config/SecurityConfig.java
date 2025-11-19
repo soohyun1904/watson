@@ -1,4 +1,4 @@
-package com.detective.game.steam.config;
+package com.detective.game.auth.infrastructure.config;
 
 import com.detective.game.steam.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
