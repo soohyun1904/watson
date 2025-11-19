@@ -14,6 +14,7 @@ public enum ErrorMessage {
     USER_EMAIL_ALREADY_EXISTS(BAD_REQUEST, "이미 사용 중인 이메일입니다."),
     USER_USERNAME_ALREADY_EXISTS(BAD_REQUEST, "이미 사용 중인 사용자 이름입니다."),
     USER_INVALID_CREDENTIALS(UNAUTHORIZED, "잘못된 이메일 또는 비밀번호입니다."),
+    USER_ID_EMPTY(BAD_REQUEST,"UserId가 필요합니다."),
 
     //공통 에러
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다"),
