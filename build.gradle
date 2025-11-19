@@ -50,6 +50,15 @@ dependencies {
 
     // WebFlux (AI 서버 HTTP 호출용)
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+
+    // JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
