@@ -3,8 +3,8 @@ package com.detective.game.common.exception;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Getter
 @AllArgsConstructor
@@ -48,20 +48,27 @@ public enum ErrorMessage {
     REFRESH_TOKEN_DELETE_ERROR(BAD_REQUEST, "토큰 삭제에 실패했습니다."),
 
     // Steam API
-    STEAM_API_REQUEST_FAILED(HttpStatus.BAD_GATEWAY, "Steam API 요청에 실패했습니다."),
-    STEAM_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "Steam API 응답 시간이 초과되었습니다."),
-    STEAM_INVALID_API_KEY(HttpStatus.UNAUTHORIZED, "유효하지 않은 Steam API 키입니다."),
-    STEAM_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Steam 사용자를 찾을 수 없습니다."),
-
-    // Steam OpenID
-    AUTH_OPENID_INVALID_PARAMS(HttpStatus.BAD_REQUEST, "OpenID 파라미터가 유효하지 않습니다."),
-    AUTH_OPENID_VALIDATION_FAILED(HttpStatus.UNAUTHORIZED, "OpenID 검증에 실패했습니다."),
-    AUTH_OPENID_REQUIRED_PARAM_MISSING(HttpStatus.BAD_REQUEST, "필수 OpenID 파라미터가 누락되었습니다."),
-    AUTH_INVALID_STEAM_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 Steam ID 형식입니다."),
+    STEAM_API_REQUEST_FAILED(BAD_GATEWAY, "Steam API 요청에 실패했습니다."),
+    STEAM_API_TIMEOUT(GATEWAY_TIMEOUT, "Steam API 응답 시간이 초과되었습니다."),
+    STEAM_INVALID_API_KEY(UNAUTHORIZED, "유효하지 않은 Steam API 키입니다."),
+    STEAM_USER_NOT_FOUND(NOT_FOUND, "Steam 사용자를 찾을 수 없습니다."),
 
     // Steam Profile
-    STEAM_INVALID_VISIBILITY_CODE(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 공개 설정 코드입니다."),
-    STEAM_INVALID_PERSONA_STATE(HttpStatus.BAD_REQUEST, "유효하지 않은 Steam 상태 코드입니다.");
+    STEAM_INVALID_VISIBILITY_CODE(BAD_REQUEST, "유효하지 않은 프로필 공개 설정 코드입니다."),
+    STEAM_INVALID_PERSONA_STATE(BAD_REQUEST, "유효하지 않은 Steam 상태 코드입니다."),
+
+    //steam 언리얼 클라이언트
+    AUTH_TICKET_REQUIRED(BAD_REQUEST, "AuthTicket이 필요합니다."),
+
+    //방 관련 오류
+    MAX_PLAYER_INVALID(BAD_REQUEST, "최대 인원은 1~4명만 가능합니다."),
+    NOT_WAITING_STATUS(BAD_REQUEST, "대기 중인 방이 아닙니다."),
+    ROOM_IS_FULL(BAD_REQUEST, "방이 가득 찼습니다."),
+    PASSWORD_MISMATCH(UNAUTHORIZED, "비밀번호가 올바르지 않습니다."),
+    ALREADY_JOINED(BAD_REQUEST, "이미 방에 참여하고 있습니다."),
+    ROOM_NOT_FOUND(NOT_FOUND, "해당 방을 찾을 수 없습니다."),
+    NOT_HOST(FORBIDDEN, "방장이 아닙니다."),
+    LOCK_FAILED_MESSAGE(CONFLICT,"방이 다른 요청에 의해 처리 중입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

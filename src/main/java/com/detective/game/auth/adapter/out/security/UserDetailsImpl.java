@@ -1,4 +1,4 @@
-package com.detective.game.steam.jwt;
+package com.detective.game.auth.adapter.out.security;
 
 import com.detective.game.user.domain.User;
 import lombok.AllArgsConstructor;

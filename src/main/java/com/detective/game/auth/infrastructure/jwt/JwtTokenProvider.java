@@ -1,11 +1,15 @@
-package com.detective.game.steam.jwt;
+package com.detective.game.auth.infrastructure.jwt;
 
+import com.detective.game.auth.adapter.out.security.UserDetailsImpl;
 import com.detective.game.common.exception.AuthException;
-import com.detective.game.steam.dto.TokenDTO;
+import com.detective.game.auth.adapter.out.security.dto.TokenDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,13 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static com.detective.game.common.exception.ErrorMessage.*;
-import static com.detective.game.common.exception.ErrorMessage.JWT_CLAIMS_EMPTY;
-import static com.detective.game.common.exception.ErrorMessage.JWT_EXPIRED;
-import static com.detective.game.common.exception.ErrorMessage.JWT_MALFORMED;
-import static com.detective.game.common.exception.ErrorMessage.JWT_UNSUPPORTED;
 
 @Slf4j
 @Component
@@ -35,15 +36,6 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
-    }
-
-    public TokenDTO generateTokens(String steamId, Long userId, String role){
-        String accessToken = generateAccessToken(steamId, userId, role);
-        String refreshToken = generateRefreshToken(steamId);
-
-        log.info("토큰 생성 완료: 스팀 ID = {}", steamId);
-
-        return new TokenDTO(accessToken, refreshToken);
     }
 
     //Access Token 생성 (12시간)
@@ -72,6 +64,25 @@ public class JwtTokenProvider {
                 .expiration(Date.from(expiration))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public Authentication getAuthentication(String token) {
+        Long userId = getUserIdFromToken(token);
+        String steamId = getSteamIdFromToken(token);
+        String role = getRoleFromToken(token).orElse("ROLE_USER");
+
+        UserDetailsImpl userDetails = new UserDetailsImpl(
+                userId,
+                steamId,
+                steamId, // username은 steamId로 사용
+                List.of(new SimpleGrantedAuthority(role))
+        );
+
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
     }
 
     // 토큰에서 Steam ID 추출

@@ -1,4 +1,4 @@
-package com.detective.game.steam.dto;
+package com.detective.game.auth.infrastructure.steam.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.detective.game.steam.model;
+package com.detective.game.auth.adapter.out.persistence.entity;
 
 import com.detective.game.common.entity.BaseEntity;
 import jakarta.persistence.*;

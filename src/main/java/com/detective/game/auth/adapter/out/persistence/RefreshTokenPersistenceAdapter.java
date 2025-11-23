@@ -6,9 +6,8 @@ import com.detective.game.auth.domain.model.AuthUser;
 import com.detective.game.common.exception.ErrorMessage;
 import com.detective.game.common.exception.RefreshTokenException;
 import com.detective.game.common.exception.UserException;
-import com.detective.game.steam.jwt.JwtTokenProvider;
-import com.detective.game.steam.model.RefreshToken;
-import com.detective.game.steam.respository.RefreshTokenRepository;
+import com.detective.game.auth.infrastructure.jwt.JwtTokenProvider;
+import com.detective.game.auth.adapter.out.persistence.entity.RefreshToken;
 import com.detective.game.user.domain.User;
 import com.detective.game.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ import static com.detective.game.common.exception.ErrorMessage.REFRESH_TOKEN_DEL
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class RefreshTokenJpaRepository implements RefreshTokenPort {
+public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;

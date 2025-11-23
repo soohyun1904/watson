@@ -1,4 +1,4 @@
-package com.detective.game.steam.dto;
+package com.detective.game.auth.infrastructure.steam.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

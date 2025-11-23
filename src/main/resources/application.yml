@@ -67,6 +67,7 @@ steam:
   api:
     key: ${STEAM_API_KEY}  # Steam Web API Key
     base-url: https://api.steampowered.com
+  app-id: 480
   openid:
     # OpenID realm (신뢰 도메인)
     realm: ${STEAM_OPENID_REALM:http://localhost:8080}

@@ -1,6 +1,6 @@
 package com.detective.game.auth.infrastructure.config;
 
-import com.detective.game.steam.jwt.JwtAuthenticationFilter;
+import com.detective.game.auth.adapter.out.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,10 +78,9 @@ public class SecurityConfig {
                         // Error 페이지
                         .requestMatchers("/error").permitAll()
 
-                        // Steam 인증 (OpenID 로그인)
+                        // Steam 인증
                         .requestMatchers(
-                                "/api/auth/steam/login",
-                                "/api/auth/steam/callback"
+                                "/api/auth/steam-client-login"
                         ).permitAll()
 
                         // 토큰 갱신 (Public)
@@ -93,7 +92,7 @@ public class SecurityConfig {
                         // 테스트용 콜백 (개발 환경)
                         .requestMatchers("/test/**").permitAll()
 
-
+                        .requestMatchers("/ws/**").permitAll()
                         // ========================================
                         // Protected 엔드포인트 (인증 필요)
                         // ========================================

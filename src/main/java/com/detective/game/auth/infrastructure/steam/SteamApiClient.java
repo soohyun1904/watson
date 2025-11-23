@@ -1,8 +1,8 @@
-package com.detective.game.steam.service;
+package com.detective.game.auth.infrastructure.steam;
 
 import com.detective.game.common.exception.SteamException;
-import com.detective.game.steam.dto.SteamApiResponse;
-import com.detective.game.steam.dto.SteamPlayerSummary;
+import com.detective.game.auth.infrastructure.steam.dto.SteamApiResponse;
+import com.detective.game.auth.infrastructure.steam.dto.SteamPlayerSummary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

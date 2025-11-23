@@ -1,11 +1,10 @@
-package com.detective.game.steam.respository;
+package com.detective.game.auth.adapter.out.persistence;
 
-import com.detective.game.steam.model.RefreshToken;
+import com.detective.game.auth.adapter.out.persistence.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 @Repository

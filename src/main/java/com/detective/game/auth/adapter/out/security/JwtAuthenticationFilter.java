@@ -1,4 +1,6 @@
-package com.detective.game.steam.jwt;
+package com.detective.game.auth.adapter.out.security;
+
+import com.detective.game.auth.application.port.out.JwtPort;
 
 import com.detective.game.common.exception.ErrorMessage;
 import com.detective.game.common.response.ApiResponse;
@@ -26,16 +28,19 @@ import static com.detective.game.common.exception.ErrorMessage.AUTH_INVALID_TOKE
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenProvider tokenProvider;
+
+    private final JwtPort jwtPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
         try {
-            // 이미 인증된 경우 스킵
-            if(SecurityContextHolder.getContext().getAuthentication() != null){
+            if (SecurityContextHolder.getContext().getAuthentication() != null) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -43,19 +48,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt)) {
-                //토큰 유효성 검증
-                tokenProvider.validateToken(jwt);
+                jwtPort.validateToken(jwt);
 
-                // Access Token인지 확인
-                if (tokenProvider.isAccessToken(jwt)) {
-                    String steamId = tokenProvider.getSteamIdFromToken(jwt);
-                    Long userId = tokenProvider.getUserIdFromToken(jwt);
-                    String role = tokenProvider.getRoleFromToken(jwt).orElse("ROLE_CUSTOMER");
+                if (jwtPort.isAccessToken(jwt)) {
+                    String steamId = jwtPort.getSteamIdFromToken(jwt);
+                    Long userId = jwtPort.getUserIdFromToken(jwt);
+                    String role = jwtPort.getRoleFromToken(jwt).orElse("ROLE_CUSTOMER");
 
                     UserDetailsImpl userDetails = new UserDetailsImpl(
                             userId,
                             steamId,
-                            null,  // username - 필요시에만 별도 API로 조회
+                            null,
                             Collections.singletonList(new SimpleGrantedAuthority(role))
                     );
 
@@ -63,7 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities()
                             );
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.info("사용자 인증 설정 완료: userId={}, steamId={}, role={}", userId, steamId, role);
@@ -86,13 +91,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private void sendErrorResponse(HttpServletResponse response, ErrorMessage errorMessage) throws IOException {
+    private void sendErrorResponse(HttpServletResponse response, ErrorMessage errorMessage)
+            throws IOException {
         response.setStatus(errorMessage.getHttpStatus().value());
         response.setContentType("application/json;charset=UTF-8");
 
-        ApiResponse<?> apiResponse = ApiResponse.error(errorMessage.getHttpStatus().value(), errorMessage.getMessage());
+        ApiResponse<?> apiResponse = ApiResponse.error(
+                errorMessage.getHttpStatus().value(),
+                errorMessage.getMessage()
+        );
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
-
         response.getWriter().write(jsonResponse);
     }
 }

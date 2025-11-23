@@ -1,11 +1,10 @@
 package com.detective.game.auth.adapter.out.security;
 
 import com.detective.game.auth.application.port.out.JwtPort;
-import com.detective.game.steam.dto.TokenDTO;
-import com.detective.game.steam.jwt.JwtTokenProvider;
+import com.detective.game.auth.application.port.out.dto.TokenPair;
+import com.detective.game.auth.infrastructure.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.Optional;
 
@@ -17,8 +16,10 @@ public class JwtTokenProviderAdapter implements JwtPort {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public TokenDTO generateTokens(String steamId, Long userId, String role) {
-        return jwtTokenProvider.generateTokens(steamId, userId, role);
+    public TokenPair generateTokens(String steamId, Long userId, String role) {
+        String accessToken = jwtTokenProvider.generateAccessToken(steamId, userId, role);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(steamId);
+        return new TokenPair(accessToken, refreshToken);
     }
 
     @Override

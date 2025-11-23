@@ -1,4 +1,4 @@
-package com.detective.game.steam.dto;
+package com.detective.game.auth.adapter.in.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

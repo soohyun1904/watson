@@ -1,7 +1,7 @@
 package com.detective.game.auth.adapter.out.persistence;
 
 import com.detective.game.auth.domain.model.AuthRefreshToken;
-import com.detective.game.steam.model.RefreshToken;
+import com.detective.game.auth.adapter.out.persistence.entity.RefreshToken;
 import org.springframework.stereotype.Component;
 
 @Component

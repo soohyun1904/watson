@@ -1,12 +1,11 @@
 package com.detective.game.auth.application.port.out;
 
-import com.detective.game.steam.dto.TokenDTO;
-
+import com.detective.game.auth.application.port.out.dto.TokenPair;
 import java.util.Date;
 import java.util.Optional;
 
 public interface JwtPort {
-    TokenDTO generateTokens(String steamId, Long userId, String role);
+    TokenPair generateTokens(String steamId, Long userId, String role);
 
     String generateAccessToken(String steamId, Long userId, String role);
 
