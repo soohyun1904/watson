@@ -93,6 +93,10 @@ public class SecurityConfig {
                         .requestMatchers("/test/**").permitAll()
 
                         .requestMatchers("/ws/**").permitAll()
+
+
+                        .requestMatchers("/api/room-context/**").permitAll()
+                        .requestMatchers("/api/rooms/**").permitAll()
                         // ========================================
                         // Protected 엔드포인트 (인증 필요)
                         // ========================================
