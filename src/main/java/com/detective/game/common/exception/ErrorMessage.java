@@ -3,8 +3,9 @@ package com.detective.game.common.exception;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_GATEWAY;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Getter
 @AllArgsConstructor
@@ -14,6 +15,7 @@ public enum ErrorMessage {
     USER_EMAIL_ALREADY_EXISTS(BAD_REQUEST, "이미 사용 중인 이메일입니다."),
     USER_USERNAME_ALREADY_EXISTS(BAD_REQUEST, "이미 사용 중인 사용자 이름입니다."),
     USER_INVALID_CREDENTIALS(UNAUTHORIZED, "잘못된 이메일 또는 비밀번호입니다."),
+    USER_ID_EMPTY(BAD_REQUEST,"UserId가 필요합니다."),
 
     //공통 에러
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다"),
@@ -47,20 +49,33 @@ public enum ErrorMessage {
     REFRESH_TOKEN_DELETE_ERROR(BAD_REQUEST, "토큰 삭제에 실패했습니다."),
 
     // Steam API
-    STEAM_API_REQUEST_FAILED(HttpStatus.BAD_GATEWAY, "Steam API 요청에 실패했습니다."),
-    STEAM_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "Steam API 응답 시간이 초과되었습니다."),
-    STEAM_INVALID_API_KEY(HttpStatus.UNAUTHORIZED, "유효하지 않은 Steam API 키입니다."),
-    STEAM_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Steam 사용자를 찾을 수 없습니다."),
-
-    // Steam OpenID
-    AUTH_OPENID_INVALID_PARAMS(HttpStatus.BAD_REQUEST, "OpenID 파라미터가 유효하지 않습니다."),
-    AUTH_OPENID_VALIDATION_FAILED(HttpStatus.UNAUTHORIZED, "OpenID 검증에 실패했습니다."),
-    AUTH_OPENID_REQUIRED_PARAM_MISSING(HttpStatus.BAD_REQUEST, "필수 OpenID 파라미터가 누락되었습니다."),
-    AUTH_INVALID_STEAM_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 Steam ID 형식입니다."),
+    STEAM_API_REQUEST_FAILED(BAD_GATEWAY, "Steam API 요청에 실패했습니다."),
+    STEAM_API_TIMEOUT(GATEWAY_TIMEOUT, "Steam API 응답 시간이 초과되었습니다."),
+    STEAM_INVALID_API_KEY(UNAUTHORIZED, "유효하지 않은 Steam API 키입니다."),
+    STEAM_USER_NOT_FOUND(NOT_FOUND, "Steam 사용자를 찾을 수 없습니다."),
 
     // Steam Profile
-    STEAM_INVALID_VISIBILITY_CODE(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 공개 설정 코드입니다."),
-    STEAM_INVALID_PERSONA_STATE(HttpStatus.BAD_REQUEST, "유효하지 않은 Steam 상태 코드입니다.");
+    STEAM_INVALID_VISIBILITY_CODE(BAD_REQUEST, "유효하지 않은 프로필 공개 설정 코드입니다."),
+    STEAM_INVALID_PERSONA_STATE(BAD_REQUEST, "유효하지 않은 Steam 상태 코드입니다."),
+
+    //steam 언리얼 클라이언트
+    AUTH_TICKET_REQUIRED(BAD_REQUEST, "AuthTicket이 필요합니다."),
+
+    //AI 서버 응답
+    AI_COMMUNICATION_FAILED(BAD_GATEWAY,"AI 서버와 통신 실패"),
+    AI_BAD_RESPONSE(BAD_GATEWAY,"AI 서버에서 비정상 응답"),
+    AI_EMPTY_RESPONSE(BAD_GATEWAY,"AI 서버 응답이 비어 있음"),
+
+    //방 관련 오류
+    MAX_PLAYER_INVALID(BAD_REQUEST, "최대 인원은 1~4명만 가능합니다."),
+    NOT_WAITING_STATUS(BAD_REQUEST, "대기 중인 방이 아닙니다."),
+    ROOM_IS_FULL(BAD_REQUEST, "방이 가득 찼습니다."),
+    PASSWORD_MISMATCH(UNAUTHORIZED, "비밀번호가 올바르지 않습니다."),
+    ALREADY_JOINED(BAD_REQUEST, "이미 방에 참여하고 있습니다."),
+    ROOM_NOT_FOUND(NOT_FOUND, "해당 방을 찾을 수 없습니다."),
+    NOT_HOST(FORBIDDEN, "방장이 아닙니다."),
+    LOCK_FAILED_MESSAGE(CONFLICT,"방이 다른 요청에 의해 처리 중입니다."),
+    ROOM_ALREADY_FINAL_SUBMITTED(CONFLICT,"\"이미 최종 보고서를 제출한 방입니다: \"");
 
     private final HttpStatus httpStatus;
     private final String message;
