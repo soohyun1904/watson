@@ -37,11 +37,11 @@ public class AIFastApiAdapter implements CallAIPort, EvaluateFinalSubmitPort {
     public AIApiRawAnswer call(AskAIOutboundCommand command) {
 
         AIApiRequest body = AIApiRequest.from(command);
+
         HttpEntity<AIApiRequest> entity =
                 new HttpEntity<>(body, createJsonHeaders());
 
         try {
-            log.info(body.getQuestion(), body.getAcquiredClueList(), body.getChatHistory());
             ResponseEntity<AIApiResponse> response =
                     restTemplate.exchange(
                             baseUrl + "/api/ai/ask",

@@ -1,7 +1,10 @@
 package com.detective.game.finalsubmit.adapter.in.web;
 
+import com.detective.game.common.response.ApiResponse;
 import com.detective.game.finalsubmit.adapter.in.web.dto.FinalSubmitRequest;
 import com.detective.game.finalsubmit.application.port.comand.SubmitFinalSheetCommand;
+import com.detective.game.finalsubmit.application.port.in.LoadFinalSubmitResultUseCase;
+import com.detective.game.finalsubmit.application.port.in.LoadFinalSubmitResultUseCase.FinalSubmitResultDto;
 import com.detective.game.finalsubmit.application.port.in.SubmitFinalSheetUseCase;
 import com.detective.game.roomcontext.application.port.command.SaveDoorStateCommand;
 import com.detective.game.roomcontext.application.port.command.SaveNoteItemCommand;
@@ -16,11 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class FinalSubmitController {
 
     private final SubmitFinalSheetUseCase submitFinalSheetUseCase;
+    private final LoadFinalSubmitResultUseCase loadFinalSubmitResultUseCase;
     private final SaveNoteItemUseCase saveNoteItemUseCase;
     private final SaveDoorStateUseCase saveDoorStateUseCase;
 
     @PostMapping("/final-submit")
-    public void submit(
+    public ApiResponse<FinalSubmitResultDto> submit(
             @RequestHeader("Room-Id") String roomId,
             @RequestBody FinalSubmitRequest req
     ) {
@@ -54,5 +58,8 @@ public class FinalSubmitController {
         );
 
         submitFinalSheetUseCase.submit(submitCommand);
+        FinalSubmitResultDto result = loadFinalSubmitResultUseCase.load(roomId);
+
+        return ApiResponse.success(result);
     }
 }

@@ -1,8 +1,6 @@
 package com.detective.game.ai.adapter.out.external.dto;
 
 import com.detective.game.ai.application.port.command.AskAIOutboundCommand;
-import com.detective.game.ai.domain.AIChatMessage;
-import com.detective.game.clue.domain.Clue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,7 +14,10 @@ public class AIApiRequest {
 
     private String question;
 
+    @JsonProperty("acquired_clue_list")
     private List<String> acquiredClueList;
+
+    @JsonProperty("chat_history")
     private List<String> chatHistory;
 
     public static AIApiRequest from(AskAIOutboundCommand command) {
