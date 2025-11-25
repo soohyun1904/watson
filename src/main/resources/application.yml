@@ -1,6 +1,8 @@
 spring:
   application:
     name: game-backend
+  jackson:
+    property-naming-strategy: SNAKE_CASE
 
   # 데이터베이스 (아직 Docker 실행 전이라 주석 처리)
   datasource:
@@ -8,6 +10,10 @@ spring:
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
 
   # JPA
   jpa:
@@ -18,44 +24,94 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+      # OSIV(Open Session In View) 비활성화
+      # 영속성 컨텍스트를 View 레이어까지 유지하지 않음 (성능 향상)
+
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-
-  # Security 임시 비활성화 (나중에 활성화)
-  security:
-    user:
-      name: admin
-      password: admin
-
-  # OAuth2 (나중에 설정)
-  # oauth2:
-  #   client:
-  #     registration:
-  #       google:
-  #         client-id: ${GOOGLE_CLIENT_ID}
-  #         client-secret: ${GOOGLE_CLIENT_SECRET}
-  #         scope: email, profile
+      timeout: 3000ms
+      lettuce:
+          pool:
+            max-active: 8
+            max-idle: 8
+            min-idle: 2
+    timeout: 3000ms
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-stacktrace: on-param  # 개발 환경에서만
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
 #  forward-headers-strategy: native
 #  tomcat:
 #    use-relative-redirects: true
 
 # JWT (나중에 사용)
 jwt:
-  secret: temporary-secret-key-change-this-later-to-something-secure-at-least-256-bits
-  expiration: 86400000
+  secret: ${JWT_SECRET}
+  access-token-expiration:
+    validity-in-minutes: 720 # 720분 = 12시간. 코드의 기본값 720000과는 다름!(단위를 분으로 맞춤)
+  refresh-token-expiration:
+    validity-in-days: 14 # 14일 (코드의 기본값과 일치)
+
+# Steam OpenID 설정
+steam:
+  api:
+    key: ${STEAM_API_KEY}  # Steam Web API Key
+    base-url: https://api.steampowered.com
+  app-id: 480
+  openid:
+    # OpenID realm (신뢰 도메인)
+    realm: ${STEAM_OPENID_REALM:http://localhost:8080}
+    # OpenID 콜백 URL
+    return-url: ${STEAM_OPENID_RETURN_URL:http://localhost:8080/api/auth/steam/callback}
+
+# 게임 클라이언트 설정
+game:
+  client:
+    deep-link-protocol: detective-game
+    success-redirect: http://localhost:8080/token-debug-page
+#    success-redirect: ${GAME_SUCCESS_REDIRECT:detective-game://auth/callback}
+    failure-redirect: ${GAME_FAILURE_REDIRECT:detective-game://auth/error}
+  session:
+    max-players: 4              # 방당 최대 인원
+    room-ttl: 3600              # 방 TTL (1시간)
+    session-ttl: 7200           # 세션 TTL (2시간)
+# Swagger 설정
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.detective.game: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
 # AI 서버 (나중에 설정)
 ai:
   server:
     url: http://localhost:8000
-
-logging:
-  level:
-    com.detective.game: DEBUG
-    org.springframework.web: DEBUG
