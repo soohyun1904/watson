@@ -94,14 +94,21 @@ public class SecurityConfig {
 
                         .requestMatchers("/ws/**").permitAll()
 
-
-                        .requestMatchers("/api/room-context/**").permitAll()
-                        .requestMatchers("/api/rooms/**").permitAll()
-                        .requestMatchers("/api/final-submit").permitAll()
                         // ========================================
                         // Protected 엔드포인트 (인증 필요)
                         // ========================================
 
+                        // 로그아웃 (인증 필요)
+                        .requestMatchers("/api/auth/logout").authenticated()
+
+                        // AI API (인증 필요)
+                        .requestMatchers("/api/rooms/**").authenticated()
+
+                        // 게임 컨텍스트 API (인증 필요)
+                        .requestMatchers("/api/room-context/**").authenticated()
+
+                        // 최종 제출 API (인증 필요)
+                        .requestMatchers("/api/final-submit").authenticated()
                         // Admin 전용
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
