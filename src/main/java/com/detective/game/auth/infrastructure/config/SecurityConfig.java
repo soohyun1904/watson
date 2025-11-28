@@ -99,16 +99,16 @@ public class SecurityConfig {
                         // ========================================
 
                         // 로그아웃 (인증 필요)
-                        .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers("/api/auth/logout").permitAll()
 
                         // AI API (인증 필요)
-                        .requestMatchers("/api/rooms/**").authenticated()
+                        .requestMatchers("/api/rooms/**").permitAll()
 
                         // 게임 컨텍스트 API (인증 필요)
-                        .requestMatchers("/api/room-context/**").authenticated()
+                        .requestMatchers("/api/room-context/**").permitAll()
 
                         // 최종 제출 API (인증 필요)
-                        .requestMatchers("/api/final-submit").authenticated()
+                        .requestMatchers("/api/final-submit").permitAll()
                         // Admin 전용
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
