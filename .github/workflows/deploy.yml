@@ -43,17 +43,20 @@ jobs:
         script: |
           cd /home/ubuntu
 
-          echo "[1] 🔍 기존 백엔드 컨테이너 중지 및 삭제"
+          echo "[1] 기존 백엔드 컨테이너 중지 및 삭제"
           docker stop backend || true
           docker rm backend || true
-
-          echo "[2] 🔍 최신 이미지 가져오기"
+          
+          echo "[2] 오래된 dangling 이미지 정리"
+          docker image prune -f || true
+          
+          echo "[2] 최신 이미지 가져오기"
           docker-compose pull backend
 
-          echo "[3] 🔍 dangling 이미지 자동 정리"
+          echo "[3] dangling 이미지 자동 정리"
           docker image prune -f || true
 
-          echo "[4] 🚀 백엔드 재실행"
+          echo "[4] 백엔드 재실행"
           docker-compose up -d backend
 
-        echo "[5] 🎉 배포 완료!"
+          echo "[5] 배포 완료!"
