@@ -23,16 +23,18 @@ public class FinalSubmitJpaEntity {
 
     private Integer score;        // 나중에 평가 점수
 
-//    피드백 추가 예정
-//    @Column(columnDefinition = "TEXT")
-//    private String feedback;
+    private String grade;       //A,B,C
+
+    @Column(columnDefinition = "TEXT")
+    private String feedback;
 
     private LocalDateTime submittedAt;
 
-    public FinalSubmitJpaEntity(String roomId, String answersJson, Integer score) {
+    public FinalSubmitJpaEntity(String roomId, String answersJson, Integer score, String feedback) {
         this.roomId = roomId;
         this.answersJson = answersJson;
         this.score = score;
+        this.feedback = feedback;
         this.submittedAt = LocalDateTime.now();
     }
 }

@@ -95,6 +95,7 @@ public class AIFastApiAdapter implements CallAIPort, EvaluateFinalSubmitPort {
 
             return new AIEvaluateRawResponse(
                     res.getScore(),
+                    res.getGrade(),
                     res.getFeedback()
             );
 

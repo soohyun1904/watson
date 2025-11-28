@@ -11,6 +11,9 @@ public class AIEvaluateResponse {
     @JsonProperty("total_score")
     private Integer score;
 
+    @JsonProperty("grade")
+    private String grade;
+
     @JsonProperty("feedback")
     private String feedback;
 }

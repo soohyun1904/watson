@@ -7,5 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AIEvaluateRawResponse {
     private final Integer score;
+    private final String grade;
     private final String feedback;
 }

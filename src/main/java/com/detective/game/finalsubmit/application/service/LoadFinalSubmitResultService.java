@@ -17,6 +17,6 @@ public class LoadFinalSubmitResultService implements LoadFinalSubmitResultUseCas
         FinalSubmitJpaEntity entity = repository.findByRoomId(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("제출 결과 없음"));
 
-        return FinalSubmitResultDto.of(entity.getScore());
+        return FinalSubmitResultDto.of(entity.getScore(), entity.getGrade(), entity.getFeedback());
     }
 }

@@ -9,19 +9,12 @@ public interface LoadFinalSubmitResultUseCase {
     @Getter
     @AllArgsConstructor
     class FinalSubmitResultDto {
-        private final int score;
+        private final Integer score;
         private final String grade;
+        private final String feedback;
 
-        public static FinalSubmitResultDto of(int score) {
-            return new FinalSubmitResultDto(score, calculateGrade(score));
-        }
-
-        private static String calculateGrade(int score) {
-            if (score >= 95) return "S";
-            if (score >= 85) return "A";
-            if (score >= 70) return "B";
-            if (score >= 60) return "C";
-            return "D";
+        public static FinalSubmitResultDto of(Integer score, String grade, String feedback) {
+            return new FinalSubmitResultDto(score, grade, feedback);
         }
     }
 }

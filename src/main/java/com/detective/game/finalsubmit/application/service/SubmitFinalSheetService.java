@@ -72,19 +72,17 @@ public class SubmitFinalSheetService implements SubmitFinalSheetUseCase {
         // 5) 외부 AI 채점 호출
         AIEvaluateRawResponse raw = evaluateFinalSubmitPort.evaluate(evalCommand);
 
-        // 6) 도메인 AIResult 복원 (필요하면)
-        AIResult result = AIResult.of(raw.getScore(), raw.getFeedback());
-
         // 7) Room 컨텍스트 최종 제출 처리
         ctx.markFinalSubmitted();
         savePort.save(ctx);
 
-        // 8) DB 저장 (지금은 score만 저장; feedback 쓰고 싶으면 엔티티 수정)
+        // 8) DB 저장
         FinalSubmitJpaEntity entity =
                 new FinalSubmitJpaEntity(
                         command.roomId(),
                         toJson(sheet.getAnswers()),
-                        result.getScore()
+                        raw.getScore(),
+                        raw.getFeedback()
                 );
 
         repository.save(entity);
