@@ -6,6 +6,7 @@ import com.detective.game.ai.application.port.in.AskAIUseCase;
 import com.detective.game.ai.domain.AIAnswer;
 import com.detective.game.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,13 +16,13 @@ public class AIController {
 
     private final AskAIUseCase askAIUseCase;
 
-    @PostMapping("/{roomId}/ai/ask")
-    public ApiResponse<AskAIResponse> ask(
-            @PathVariable String roomId,
+    @PostMapping("/ai/ask")
+    public ResponseEntity<ApiResponse<AskAIResponse>> ask(
+            @RequestHeader("Room-Id") String roomId,
             @RequestBody AskAIRequest request
     ) {
         AIAnswer answer = askAIUseCase.ask(roomId, request.getQuestion());
         AskAIResponse dto = new AskAIResponse(answer.getText());
-        return ApiResponse.success(dto);
+        return ResponseEntity.ok(ApiResponse.success(dto));
     }
 }

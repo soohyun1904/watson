@@ -11,6 +11,7 @@ import com.detective.game.roomcontext.application.port.command.SaveNoteItemComma
 import com.detective.game.roomcontext.application.port.in.SaveDoorStateUseCase;
 import com.detective.game.roomcontext.application.port.in.SaveNoteItemUseCase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +25,7 @@ public class FinalSubmitController {
     private final SaveDoorStateUseCase saveDoorStateUseCase;
 
     @PostMapping("/final-submit")
-    public ApiResponse<FinalSubmitResultDto> submit(
+    public ResponseEntity<ApiResponse<FinalSubmitResultDto>> submit(
             @RequestHeader("Room-Id") String roomId,
             @RequestBody FinalSubmitRequest req
     ) {
@@ -60,6 +61,6 @@ public class FinalSubmitController {
         submitFinalSheetUseCase.submit(submitCommand);
         FinalSubmitResultDto result = loadFinalSubmitResultUseCase.load(roomId);
 
-        return ApiResponse.success(result);
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 }
