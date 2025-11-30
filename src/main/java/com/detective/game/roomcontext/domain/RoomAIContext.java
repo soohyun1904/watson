@@ -37,7 +37,7 @@ public class RoomAIContext {
 
     public List<String> getCollectedClueCodes() {
         return sharedInventory.stream()
-                .map(NoteItem::getNoteName)
+                .map(NoteItem::getItemId)
                 .distinct()
                 .toList();
     }
