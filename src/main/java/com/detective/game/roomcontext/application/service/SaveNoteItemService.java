@@ -7,8 +7,10 @@ import com.detective.game.roomcontext.application.port.out.SaveRoomContextPort;
 import com.detective.game.roomcontext.domain.NoteItem;
 import com.detective.game.roomcontext.domain.RoomAIContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SaveNoteItemService implements SaveNoteItemUseCase {
@@ -21,15 +23,15 @@ public class SaveNoteItemService implements SaveNoteItemUseCase {
         RoomAIContext ctx = loadPort.load(command.roomId());
         NoteItem item = NoteItem.of(command.noteName(), command.heSpy(), command.itemId());
         
-        System.out.println("=== DEBUG SAVE NOTE ITEM ===");
-        System.out.println("Room ID: " + command.roomId());
-        System.out.println("Note Name: " + command.noteName());
-        System.out.println("Before Add - Inventory Size: " + ctx.getSharedInventory().size());
+        log.info("=== DEBUG SAVE NOTE ITEM ===");
+        log.info("Room ID: " + command.roomId());
+        log.info("Note Name: " + command.noteName());
+        log.info("Before Add - Inventory Size: " + ctx.getSharedInventory().size());
         
         ctx.addNoteItem(item);
-        
-        System.out.println("After Add - Inventory Size: " + ctx.getSharedInventory().size());
-        System.out.println("Clue Codes: " + ctx.getCollectedClueCodes());
+
+        log.info("After Add - Inventory Size: " + ctx.getSharedInventory().size());
+        log.info("Clue Codes: " + ctx.getCollectedClueCodes());
         
         savePort.save(ctx);
     }
