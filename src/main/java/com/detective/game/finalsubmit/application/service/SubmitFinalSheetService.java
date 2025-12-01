@@ -3,7 +3,6 @@ package com.detective.game.finalsubmit.application.service;
 import com.detective.game.ai.application.port.command.EvaluateFinalSubmitCommand;
 import com.detective.game.ai.application.port.out.EvaluateFinalSubmitPort;
 import com.detective.game.ai.application.port.out.dto.AIEvaluateRawResponse;
-import com.detective.game.ai.domain.AIResult;
 import com.detective.game.clue.application.port.out.LoadCluePort;
 import com.detective.game.clue.domain.Clue;
 import com.detective.game.common.exception.FinalSubmitException;
@@ -19,13 +18,13 @@ import com.detective.game.roomcontext.domain.RoomAIContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-
 import static com.detective.game.common.exception.ErrorMessage.ROOM_ALREADY_FINAL_SUBMITTED;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SubmitFinalSheetService implements SubmitFinalSheetUseCase {
@@ -56,6 +55,7 @@ public class SubmitFinalSheetService implements SubmitFinalSheetUseCase {
                 command.isFinal(),
                 command.answers()
         );
+        log.info("sheetAnswers:{}, sheetIsFinal:{}", sheet.getAnswers(),sheet.isFinalSubmit());
 
         // 3) 단서 코드 → Clue 조회
         List<String> codes = ctx.getCollectedClueCodes();
@@ -66,9 +66,10 @@ public class SubmitFinalSheetService implements SubmitFinalSheetUseCase {
         // 4) 평가용 OutboundCommand 생성
         EvaluateFinalSubmitCommand evalCommand =
                 EvaluateFinalSubmitCommand.from(
-                        command.roomId(), sheet, clues, ctx
+                        sheet, clues, ctx
                 );
 
+        log.info("evalCommand:{}",evalCommand.getRoomId());
         // 5) 외부 AI 채점 호출
         AIEvaluateRawResponse raw = evaluateFinalSubmitPort.evaluate(evalCommand);
 
@@ -80,6 +81,7 @@ public class SubmitFinalSheetService implements SubmitFinalSheetUseCase {
         FinalSubmitJpaEntity entity =
                 new FinalSubmitJpaEntity(
                         command.roomId(),
+                        raw.getGrade(),
                         toJson(sheet.getAnswers()),
                         raw.getScore(),
                         raw.getFeedback()

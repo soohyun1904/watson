@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -27,21 +25,22 @@ public class AIEvaluateRequest {
 
     public static AIEvaluateRequest from(EvaluateFinalSubmitCommand command) {
 
-        List<String> answers = command.getAnswers();
+        boolean isMiljeong = command.isFinal();
 
-        String conclusionRaw = answers.size() > 0 ? answers.get(0) : "";
-        String conclusion = "밀정".equals(conclusionRaw) ? "miljeong" : "anti_miljeong";
 
-        List<String> selectedIds = answers.size() > 1
-                ? Arrays.stream(answers.get(1).split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList()
-                : List.of();
+        // 결론 코드 변환
+        String conclusion = isMiljeong ? "miljeong" : "anti_miljeong";
 
-        String reasoning = answers.size() > 2 ? answers.get(2) : "";
+        // 전체 수집 단서 ID
+        List<String> totalCollected = command.getClueIds();
 
-        List<String> totalCollected = command.getClueContents();
+        // 근거 자동 추출 (A = 밀정, B = 비밀정)
+        List<String> selectedIds = totalCollected.stream()
+                .filter(id -> isMiljeong ? id.startsWith("A") : id.startsWith("B"))
+                .toList();
+
+        // 서술형 이유
+        String reasoning = command.getAnswers().get(0);
 
         return new AIEvaluateRequest(
                 conclusion,
@@ -49,5 +48,5 @@ public class AIEvaluateRequest {
                 totalCollected,
                 reasoning
         );
-    }
+   }
 }

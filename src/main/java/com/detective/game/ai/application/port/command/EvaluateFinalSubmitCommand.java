@@ -14,7 +14,8 @@ public class EvaluateFinalSubmitCommand {
 
     private final String roomId;
     private final List<String> answers;
-    private final List<String> clueContents;
+    private final boolean isFinal;
+    private final List<String> clueIds;
     private final List<InventoryItem> inventory;
     private final List<DoorInfo> doorStates;
 
@@ -34,16 +35,16 @@ public class EvaluateFinalSubmitCommand {
     }
 
     public static EvaluateFinalSubmitCommand from(
-            String roomId,
             FinalSheet sheet,
             List<Clue> clues,
             RoomAIContext ctx
     ) {
         return new EvaluateFinalSubmitCommand(
-                roomId,
+                ctx.getRoomId(),
                 sheet.getAnswers(),
+                sheet.isFinalSubmit(),
                 clues.stream()
-                        .map(Clue::getContent)
+                        .map(Clue::getCode)
                         .toList(),
                 ctx.getSharedInventory().stream()
                         .map(i -> new InventoryItem(i.getNoteName(), i.isHeSpy(), i.getItemId()))

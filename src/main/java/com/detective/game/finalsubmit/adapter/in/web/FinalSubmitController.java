@@ -11,9 +11,11 @@ import com.detective.game.roomcontext.application.port.command.SaveNoteItemComma
 import com.detective.game.roomcontext.application.port.in.SaveDoorStateUseCase;
 import com.detective.game.roomcontext.application.port.in.SaveNoteItemUseCase;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class FinalSubmitController {
         // 1) sharedInventory / doorStates도 RoomAIContext에 반영 (혹시 누락된 이벤트가 있을 수 있으니까)
         if (req.getSharedInventory() != null) {
             req.getSharedInventory().forEach(it -> {
-                SaveNoteItemCommand noteCommand = new SaveNoteItemCommand(
+                SaveNoteItemCommand noteCommand = SaveNoteItemCommand.of(
                         roomId,
                         it.getNoteName(),
                         it.isHeSpy(),
@@ -43,7 +45,7 @@ public class FinalSubmitController {
         }
         if (req.getDoorStates() != null) {
             req.getDoorStates().forEach(ds -> {
-                SaveDoorStateCommand doorCommand = new SaveDoorStateCommand(
+                SaveDoorStateCommand doorCommand = SaveDoorStateCommand.of(
                         roomId,
                         ds.getDoorId(),
                         ds.isLocked()
@@ -52,7 +54,7 @@ public class FinalSubmitController {
             });
         }
 
-        SubmitFinalSheetCommand submitCommand = new SubmitFinalSheetCommand(
+        SubmitFinalSheetCommand submitCommand = SubmitFinalSheetCommand.of(
                 roomId,
                 req.getSheet().isFinal(),
                 req.getSheet().getAnswers()

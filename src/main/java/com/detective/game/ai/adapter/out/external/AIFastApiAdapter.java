@@ -70,8 +70,8 @@ public class AIFastApiAdapter implements CallAIPort, EvaluateFinalSubmitPort {
     // ===== 2) 채점 (/evaluate) =====
     @Override
     public AIEvaluateRawResponse evaluate(EvaluateFinalSubmitCommand command) {
-
         AIEvaluateRequest body = AIEvaluateRequest.from(command);
+
         HttpEntity<AIEvaluateRequest> entity =
                 new HttpEntity<>(body, createJsonHeaders());
 

@@ -1,5 +1,6 @@
 package com.detective.game.finalsubmit.adapter.in.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public class FinalSubmitRequest {
 
     @Getter
     public static class SheetDto {
+
+        @JsonProperty("is_final")
         private boolean isFinal;
         private List<String> answers;
     }

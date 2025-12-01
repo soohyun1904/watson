@@ -30,8 +30,9 @@ public class FinalSubmitJpaEntity {
 
     private LocalDateTime submittedAt;
 
-    public FinalSubmitJpaEntity(String roomId, String answersJson, Integer score, String feedback) {
+    public FinalSubmitJpaEntity(String roomId, String grade,  String answersJson, Integer score, String feedback) {
         this.roomId = roomId;
+        this.grade = grade;
         this.answersJson = answersJson;
         this.score = score;
         this.feedback = feedback;
